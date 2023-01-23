@@ -125,18 +125,22 @@ app.get("/states/:stateId/stats/", async (request, response) => {
   const { stateId } = request.params;
   const getStatsQuery = `
     SELECT 
-        SUM(cases) as totalCases,
-        SUM(cured) as totalCured,
-        SUM(active) as totalActive,
-        SUM(deaths) as totalDeaths
+        SUM(cases),
+        SUM(cured),
+        SUM(active),
+        SUM(deaths)
     FROM 
         district
     WHERE
         state_id = ${stateId};`;
-  const statArray = await database.all(getStatsQuery);
-  response.send(statArray);
+  const stats = await database.all(getStatsQuery);
+  response.send({
+    totalCases: stats["SUM(cases)"],
+    totalCured: stats["SUM(cured)"],
+    totalActive: stats["SUM(active)"],
+    totalDeaths: stats["SUM(deaths)"],
+  });
 });
-
 app.get("/districts/:districtId/details/", async (request, response) => {
   const { districtId } = request.params;
   const getStateNameQuery = `
